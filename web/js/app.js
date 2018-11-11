@@ -1,4 +1,9 @@
-var loadedData = '[{"name":"first","size":"20","date":"2012-4-12 12:34:00"},{"name":"second","size":"220","date":"2018-2-25 14:55:46"}]';
+let loadedData = '[{"name":"first.html","size":"20","date":"2012-4-12 12:34:00"},' +
+    '{"name":"second.bin","size":"220","date":"2016-11-14 12:05:21"},' +
+    '{"name":"third.exe","size":"25","date":"2015-1-24 08:23:12"},' +
+    '{"name":"app.js","size":"32","date":"2016-4-12 09:13:22"},' +
+    '{"name":"main.php","size":"4","date":"2014-11-14 10:56:59"},' +
+    '{"name":"index.html","size":"8","date":"2007-7-17 18:23:53"}]';
 
 Ext.define('Files', {
     extend: 'Ext.data.Model',
@@ -20,9 +25,10 @@ Ext.define('Files', {
 });
 
 Ext.application({
-    name: 'Application For FB',
+    name: 'FileManagerApp',
+
     launch: function () {
-        var store = Ext.create('Ext.data.Store', {
+        let store = Ext.create('Ext.data.Store', {
             model: 'Files',
         });
 
@@ -37,6 +43,11 @@ Ext.application({
                     xtype: 'grid',
                     columnLines: true,
                     store: store,
+                    selModel: {
+                        type: 'checkboxmodel',
+                        checkOnly: true
+                    },
+
                     columns: [{
                         header: 'Имя',
                         dataIndex: 'name',
@@ -59,8 +70,8 @@ Ext.application({
                         text: 'Добавить',
                         tooltip: 'Добавить новый файл',
                     }, '-', {
-                        text: 'Получить',
-                        tooltip: 'Получить файлы',
+                        text: 'Скачать',
+                        tooltip: 'Скачать файлы',
                     }, '-', {
                         text: 'Удалить',
                         tooltip: 'Удалить файл',
@@ -69,7 +80,7 @@ Ext.application({
             }]
         });
 
-        var testJS = JSON.parse(loadedData);
+        let testJS = JSON.parse(loadedData);
         store.loadData(testJS);
     }
 });
