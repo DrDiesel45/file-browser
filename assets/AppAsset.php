@@ -21,7 +21,7 @@ class AppAsset extends AssetBundle
     public $baseUrl = '@web';
     public $css = [
         'css/site.css',
-        'lib/extjs/build/classic/theme-gray/resources/theme-gray-all.css',
+        'lib/extjs/build/classic/theme-neptune/resources/theme-neptune-all.css',
 
     ];
     public $js = [
