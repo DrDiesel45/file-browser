@@ -1,4 +1,5 @@
 var loadedData = '[{"name":"first","size":"20","date":"2012-4-12 12:34:00"},{"name":"second","size":"220","date":"2018-2-25 14:55:46"}]';
+
 Ext.define('Files', {
     extend: 'Ext.data.Model',
     fields: [
@@ -29,11 +30,12 @@ Ext.application({
             layout: 'border',
             items: [{
                 region: 'center',
-                xtype: 'panel', // Panel itself has no title
-                activeTab: 0, // First tab active by default
+                xtype: 'panel',
+                activeTab: 0,
                 items: {
                     title: 'Файловый менеджер',
                     xtype: 'grid',
+                    columnLines: true,
                     store: store,
                     columns: [{
                         header: 'Имя',
@@ -44,13 +46,24 @@ Ext.application({
                         dataIndex: 'size',
                         xtype: 'numbercolumn',
                         format: '0',
-                        flex: 1
+                        width: 200
                     }, {
                         header: 'Дата',
                         dataIndex: 'date',
                         xtype: 'datecolumn',
                         format: 'Y-m-d H:i:s',
-                        flex: 1
+                        width: 200
+                    }],
+
+                    tbar: [{
+                        text: 'Добавить',
+                        tooltip: 'Добавить новый файл',
+                    }, '-', {
+                        text: 'Получить',
+                        tooltip: 'Получить файлы',
+                    }, '-', {
+                        text: 'Удалить',
+                        tooltip: 'Удалить файл',
                     }],
                 }
             }]

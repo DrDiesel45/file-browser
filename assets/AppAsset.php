@@ -22,7 +22,6 @@ class AppAsset extends AssetBundle
     public $css = [
         'css/site.css',
         'lib/extjs/build/classic/theme-neptune/resources/theme-neptune-all.css',
-
     ];
     public $js = [
         'lib/extjs/build/ext-all-debug.js',
