@@ -24,11 +24,24 @@ Ext.define('Files', {
     ]
 });
 
+// Ext.onReady(function () {
+//     Ext.Ajax.request({
+//         url: 'ajaxData.json',
+//         success: function (response) {
+//             alert(response.responseText);
+//         },
+//         failure: function (response) {
+//             alert("Ошибка: " + response.statusText);
+//         }
+//     });
+//
+// });
+
 Ext.application({
     name: 'FileManagerApp',
 
     launch: function () {
-        let store = Ext.create('Ext.data.Store', {
+        let storeFiles = Ext.create('Ext.data.Store', {
             model: 'Files',
         });
 
@@ -36,13 +49,13 @@ Ext.application({
             layout: 'border',
             items: [{
                 region: 'center',
-                xtype: 'panel',
+                xtype: 'tabpanel',
                 activeTab: 0,
-                items: {
-                    title: 'Файловый менеджер',
+                items: [{
+                    title: 'Файловая система',
                     xtype: 'grid',
                     columnLines: true,
-                    store: store,
+                    store: storeFiles,
                     selModel: {
                         type: 'checkboxmodel',
                         checkOnly: true
@@ -76,11 +89,49 @@ Ext.application({
                         text: 'Удалить',
                         tooltip: 'Удалить файл',
                     }],
-                }
+                }, {
+                    title: 'Dropbox',
+                    xtype: 'grid',
+                    columnLines: true,
+                    store: storeFiles,
+                    selModel: {
+                        type: 'checkboxmodel',
+                        checkOnly: true
+                    },
+
+                    columns: [{
+                        header: 'Имя',
+                        dataIndex: 'name',
+                        flex: 1
+                    }, {
+                        header: 'Размер',
+                        dataIndex: 'size',
+                        xtype: 'numbercolumn',
+                        format: '0',
+                        width: 200
+                    }, {
+                        header: 'Дата',
+                        dataIndex: 'date',
+                        xtype: 'datecolumn',
+                        format: 'Y-m-d H:i:s',
+                        width: 200
+                    }],
+
+                    tbar: [{
+                        text: 'Добавить',
+                        tooltip: 'Добавить новый файл',
+                    }, '-', {
+                        text: 'Скачать',
+                        tooltip: 'Скачать файлы',
+                    }, '-', {
+                        text: 'Удалить',
+                        tooltip: 'Удалить файл',
+                    }],
+                }]
             }]
         });
 
         let testJS = JSON.parse(loadedData);
-        store.loadData(testJS);
+        storeFiles.loadData(testJS);
     }
 });
