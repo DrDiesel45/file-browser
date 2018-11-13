@@ -12,10 +12,10 @@ Ext.define('Files', {
             name: 'name', type: 'string'
         },
         {
-            name: 'size', type: 'number'
+            name: 'size', type: 'string'
         },
         {
-            name: 'date', type: 'date', dateFormat: 'Y-n-d H:i:s'
+            name: 'date', type: 'date', dateFormat: 'Y-m-d H:i:s O'
         }
     ]
 });
@@ -25,15 +25,16 @@ Ext.application({
     name: 'FileManagerApp',
 
     launch: function () {
-        var store = Ext.create('Ext.data.Store', {
+        var filesStore = Ext.create('Ext.data.Store', {
             model: 'Files',
         });
 
         Ext.onReady(function () {
             Ext.Ajax.request({
-                url: 'js/ajaxtest.json',
+                url: '/site/list',
                 success: function (response) {
-                    // alert(response.responseText);
+                    var jsonData = JSON.parse(response.responseText);
+                    filesStore.loadData(jsonData);
                 },
                 failure: function (response) {
                     alert("Ошибка: " + response.statusText);
@@ -84,7 +85,7 @@ Ext.application({
                         title: 'Файловая система',
                         xtype: 'grid',
                         columnLines: true,
-                        store: store,
+                        store: filesStore,
                         selModel: {
                             type: 'checkboxmodel',
                             checkOnly: true
@@ -93,12 +94,17 @@ Ext.application({
                         columns: [{
                             header: 'Имя', dataIndex: 'name', flex: 1
                         }, {
-                            header: 'Размер', dataIndex: 'size',
-                            xtype: 'numbercolumn', format: '0', width: 200
+                            header: 'Размер', dataIndex: 'size', width: 200
                         }, {
                             header: 'Дата', dataIndex: 'date',
                             xtype: 'datecolumn', format: 'Y-m-d H:i:s', width: 200
                         }],
+
+                        listeners: {
+                            itemdblclick: function() {
+
+                            }
+                        },
 
                         tbar: [{
                             xtype: 'button', text: 'Добавить',
@@ -129,7 +135,7 @@ Ext.application({
                         title: 'Dropbox',
                         xtype: 'grid',
                         columnLines: true,
-                        store: store,
+                        store: filesStore,
                         selModel: {
                             type: 'checkboxmodel',
                             checkOnly: true
@@ -173,8 +179,5 @@ Ext.application({
                     }]
                 }]
         });
-
-        var testJS = JSON.parse(loadedData);
-        store.loadData(testJS);
     }
 });

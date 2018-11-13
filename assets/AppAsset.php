@@ -26,8 +26,6 @@ class AppAsset extends AssetBundle
     public $js = [
         'lib/extjs/build/ext-all-debug.js',
         'js/app.js',
-        'js/ajaxtest.json',
-        'php/upload.php',
     ];
     public $depends = [
         'yii\web\YiiAsset',
