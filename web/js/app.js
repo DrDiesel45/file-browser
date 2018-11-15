@@ -1,10 +1,3 @@
-var loadedData = '[{"name":"first.html","size":"20","date":"2012-4-12 12:34:00"},' +
-    '{"name":"second.bin","size":"220","date":"2016-11-14 12:05:21"},' +
-    '{"name":"third.exe","size":"25","date":"2015-1-24 08:23:12"},' +
-    '{"name":"app.js","size":"32","date":"2016-4-12 09:13:22"},' +
-    '{"name":"main.php","size":"4","date":"2014-11-14 10:56:59"},' +
-    '{"name":"index.html","size":"8","date":"2007-7-17 18:23:53"}]';
-
 Ext.define('Files', {
     extend: 'Ext.data.Model',
     fields: [
@@ -39,13 +32,13 @@ Ext.application({
                 failure: function (response) {
                     alert("Ошибка: " + response.statusText);
                 }
-            })
+            });
         });
 
         Ext.create('Ext.container.Viewport', {
             layout: 'border',
             items: [{
-                region: 'north',
+                /*region: 'north',
                 xtype: 'form',
                 // title: 'Загрузка файла',
                 padding: '2px',
@@ -76,108 +69,140 @@ Ext.application({
                     }
                 }]
             },
-                {
-                    region: 'center',
-                    xtype: 'tabpanel',
-                    activeTab: 0,
-                    padding: '2px',
-                    items: [{
-                        title: 'Файловая система',
-                        xtype: 'grid',
-                        columnLines: true,
-                        store: filesStore,
-                        selModel: {
-                            type: 'checkboxmodel',
-                            checkOnly: true
-                        },
+                {*/
+                region: 'center',
+                xtype: 'tabpanel',
+                activeTab: 0,
+                padding: '2px',
+                items: [{
+                    title: 'Файловая система',
+                    xtype: 'grid',
+                    columnLines: true,
+                    store: filesStore,
+                    selModel: {
+                        type: 'checkboxmodel',
+                        checkOnly: true
+                    },
 
-                        columns: [{
-                            header: 'Имя', dataIndex: 'name', flex: 1
-                        }, {
-                            header: 'Размер', dataIndex: 'size', width: 200
-                        }, {
-                            header: 'Дата', dataIndex: 'date',
-                            xtype: 'datecolumn', format: 'Y-m-d H:i:s', width: 200
-                        }],
-
-                        listeners: {
-                            itemdblclick: function() {
-
-                            }
-                        },
-
-                        tbar: [{
-                            xtype: 'button', text: 'Добавить',
-                            tooltip: 'Добавить новый файл',
-                            listeners: {
-                                click: function () {
-                                    // TODO: сделать функционал кнопки
-                                }
-                            }
-                        }, '-', {
-                            xtype: 'button', text: 'Скачать',
-                            tooltip: 'Скачать выбранные файлы',
-                            listeners: {
-                                click: function () {
-                                    // TODO: сделать функционал кнопки
-                                }
-                            }
-                        }, '-', {
-                            xtype: 'button', text: 'Удалить',
-                            tooltip: 'Удалить выбранные файлы',
-                            listeners: {
-                                click: function () {
-                                    // TODO: сделать функционал кнопки
-                                }
-                            }
-                        }],
+                    columns: [{
+                        header: 'Имя', dataIndex: 'name', flex: 1
                     }, {
-                        title: 'Dropbox',
-                        xtype: 'grid',
-                        columnLines: true,
-                        store: filesStore,
-                        selModel: {
-                            type: 'checkboxmodel',
-                            checkOnly: true
-                        },
+                        header: 'Размер', dataIndex: 'size', width: 200
+                    }, {
+                        header: 'Дата', dataIndex: 'date',
+                        xtype: 'datecolumn', format: 'Y-m-d H:i:s', width: 200
+                    }],
+                    // По двойному клику на строку создается путь до файла, путем сложения корня и имени
+                    // нажатой папки, в которой он лежит. Если двойной клик по точкам (.. или .), то
+                    // происходит возврат на уровень выше, путем удаления имени папки, из которой мы вышли
+                    listeners: {
+                        rowdblclick: function (grid, rowIndex) {
+                            // массив для хранения имен нажатых строк
+                            var filePathFirst = [];
+                            // модель выбора строки из grid
+                            var selectionModel = grid.getSelectionModel(), record;
+                            // выделение нажатой строки
+                            selectionModel.select(rowIndex);
+                            // получение модели, которая отображена на выделенной строке в переменную
+                            // record для дальнейшей манипуляции
+                            record = selectionModel.getSelection()[0];
+                            // проверка условий и внесение имен в массив
+                            if (record.get('name') !== '..' && record.get('name') !== '.') {
+                                filePathFirst.push(record.get('name'));
+                            // удаление последнего элемента из массива
+                            } else filePathFirst.pop();
+                            // склеивание элементов массива через / в строку с путем по папкам
+                            var filePath = filePathFirst.join('/');
+                            console.log(filePath);
 
-                        columns: [{
-                            header: 'Имя', dataIndex: 'name', flex: 1
-                        }, {
-                            header: 'Размер', dataIndex: 'size',
-                            xtype: 'numbercolumn', format: '0', width: 200
-                        }, {
-                            header: 'Дата', dataIndex: 'date',
-                            xtype: 'datecolumn', format: 'Y-m-d H:i:s', width: 200
-                        }],
+                            // передача строки с путём на сервер
+                            Ext.Ajax.request({
+                                url: '/site/list',
+                                method: 'GET',
+                                params: {
+                                    $path: filePath
+                                },
+                                success: function (response) {
+                                    alert ("Успех! " + response.statusText)
+                                },
+                                failure: function (response) {
+                                    alert("Ошибка: " + response.statusText);
+                                }
+                            });
+                        }
+                    },
 
-                        tbar: [{
-                            xtype: 'button', text: 'Добавить',
-                            tooltip: 'Добавить новый файл',
-                            listeners: {
-                                click: function () {
-                                    // TODO: сделать функционал кнопки
-                                }
+                    tbar: [{
+                        xtype: 'button', text: 'Добавить',
+                        tooltip: 'Добавить новый файл',
+                        listeners: {
+                            click: function () {
+                                // TODO: сделать функционал кнопки
                             }
-                        }, '-', {
-                            xtype: 'button', text: 'Скачать',
-                            tooltip: 'Скачать выбранные файлы',
-                            listeners: {
-                                click: function () {
-                                    // TODO: сделать функционал кнопки
-                                }
+                        }
+                    }, '-', {
+                        xtype: 'button', text: 'Скачать',
+                        tooltip: 'Скачать выбранные файлы',
+                        listeners: {
+                            click: function () {
+                                // TODO: сделать функционал кнопки
                             }
-                        }, '-', {
-                            xtype: 'button', text: 'Удалить',
-                            tooltip: 'Удалить выбранные файлы',
-                            listeners: {
-                                click: function () {
-                                    // TODO: сделать функционал кнопки
-                                }
+                        }
+                    }, '-', {
+                        xtype: 'button', text: 'Удалить',
+                        tooltip: 'Удалить выбранные файлы',
+                        listeners: {
+                            click: function () {
+                                // TODO: сделать функционал кнопки
                             }
-                        }],
-                    }]
+                        }
+                    }],
+                }, {
+                    title: 'Dropbox',
+                    xtype: 'grid',
+                    columnLines: true,
+                    store: filesStore,
+                    selModel: {
+                        type: 'checkboxmodel',
+                        checkOnly: true
+                    },
+
+                    columns: [{
+                        header: 'Имя', dataIndex: 'name', flex: 1
+                    }, {
+                        header: 'Размер', dataIndex: 'size', width: 200
+                    }, {
+                        header: 'Дата', dataIndex: 'date',
+                        xtype: 'datecolumn', format: 'Y-m-d H:i:s', width: 200
+                    }],
+
+                    tbar: [{
+                        xtype: 'button', text: 'Добавить',
+                        tooltip: 'Добавить новый файл',
+                        listeners: {
+                            click: function () {
+                                // TODO: сделать функционал кнопки
+                            }
+                        }
+                    }, '-', {
+                        xtype: 'button', text: 'Скачать',
+                        tooltip: 'Скачать выбранные файлы',
+                        listeners: {
+                            click: function () {
+                                // TODO: сделать функционал кнопки
+                            }
+                        }
+                    }, '-', {
+                        xtype: 'button', text: 'Удалить',
+                        tooltip: 'Удалить выбранные файлы',
+                        listeners: {
+                            click: function () {
+                                // TODO: сделать функционал кнопки
+                            }
+                        }
+                    }],
                 }]
+            }]
         });
     }
 });

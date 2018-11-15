@@ -37,14 +37,20 @@ class SiteController extends Controller
     }
 
     /**
+     * Вывод на экран содержимого файловой системы
+     *
+     * @param string $path
      * @return string
      */
 
     public function actionList($path = '')
     {
 //        $list = scandir(Yii::getAlias('@webroot/storage'));
-        $storageRoot = '/';
-        $list = scandir($storageRoot.'/'.$path);
+        $request = Yii::$app->request;
+        $path = $request->get('path', 'Users');
+
+        $storageRoot = '/'.$path;
+        $list = scandir($storageRoot);
 
         $listOfFiles = [];
         foreach ($list as $filename) {
@@ -57,6 +63,10 @@ class SiteController extends Controller
         }
         return $this->asJson($listOfFiles);
     }
+
+    /**
+     * Добавление файлов
+     */
 
     public function actionUpload()
     {
