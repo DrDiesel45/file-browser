@@ -113,3 +113,8 @@ a.desc:after {
 .nav > li > form > button.logout:focus {
     outline: none;
 }
+
+.new-icon {background:transparent url(new.ico) center 0 no-repeat;}
+.add-icon {background:transparent url(add.ico) center 0 no-repeat;}
+.save-icon {background:transparent url(save.ico) center 0 no-repeat;}
+.delete-icon {background:transparent url(delete.ico) center 0 no-repeat;}

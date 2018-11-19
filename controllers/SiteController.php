@@ -39,29 +39,56 @@ class SiteController extends Controller
     /**
      * Вывод на экран содержимого файловой системы
      *
-     * @param string $path
      * @return string
      */
 
-    public function actionList($path = '')
+    public function actionList()
     {
-//        $list = scandir(Yii::getAlias('@webroot/storage'));
+        $storageRoot = Yii::getAlias('@webroot/storage/');
         $request = Yii::$app->request;
-        $path = $request->get('path', 'Users');
+        $path = $request->get('path', '');
 
-        $storageRoot = '/'.$path;
-        $list = scandir($storageRoot);
+//        $storageRoot = '/';
+
+        $currentRoot = $storageRoot . $path;
+//        $list = array_diff(scandir($currentRoot), array('.'));
+
+        $list = scandir($currentRoot);
 
         $listOfFiles = [];
         foreach ($list as $filename) {
-            $filePath = $storageRoot.'/'.$filename;
-            $listOfFiles[] = [
-                'name' => $filename,
-                'size' => !is_dir($filePath) ? Yii::$app->formatter->asShortSize(filesize($filePath)) : null,
-                'date' => date('Y-m-d H:i:s O', filemtime($filePath)),
-        ];
+            $filePath = $currentRoot . '/' . $filename;
+            if (((filetype($filePath) == 'dir') || (filetype($filePath) == 'file')) && !(((strpos($filename, '.'))) === 0)) {
+                $listOfFiles[] = [
+                    'name' => $filename,
+                    'size' => !is_dir($filePath) ? Yii::$app->formatter->asShortSize(filesize($filePath)) : null,
+                    'type' => filetype($filePath),
+                    'date' => date('Y-m-d H:i:s O', filemtime($filePath)),
+                ];
+            }
         }
+        array_unshift($listOfFiles, [
+            'name' => '..',
+            'size' => null,
+            'type' => 'dir',
+            'date' => date('Y-m-d H:i:s O', filemtime($filePath)),
+        ]);
         return $this->asJson($listOfFiles);
+    }
+
+    /**
+     * Создание файла
+     */
+
+    public function actionCreate()
+    {
+        $storageRoot = Yii::getAlias('@webroot/storage/');
+
+        $request = Yii::$app->request;
+        $path = $request->get('path', '');
+
+        $currentRoot = $storageRoot . $path;
+
     }
 
     /**
@@ -70,15 +97,50 @@ class SiteController extends Controller
 
     public function actionUpload()
     {
-        var_dump($_FILES);
-        die;
-        $uploaddir = 'storage/';
-        $uploadfile = $uploaddir . basename($_FILES['document']['name']);
+        $storageRoot = Yii::getAlias('@webroot/storage/');
 
-        if (move_uploaded_file($_FILES['document']['tmp_name'], $uploadfile)) {
-            echo '{"success": true, "file": "' . $uploadfile . '" }';
+        $request = Yii::$app->request;
+        $path = $request->get('path', '');
+
+        $currentRoot = $storageRoot . $path;
+
+        $uploadFile = $currentRoot . basename($_FILES['document']['name']);
+
+        if (move_uploaded_file($_FILES['document']['tmp_name'], $uploadFile)) {
+            echo '{"success": true, "file": "' . $uploadFile . '" }';
         } else {
             echo '{"success": false}';
         }
+    }
+
+    /**
+     * Сохранение файла
+     */
+
+    public function actionLoad()
+    {
+        $storageRoot = Yii::getAlias('@webroot/storage/');
+
+        $request = Yii::$app->request;
+        $path = $request->get('path', '');
+
+        $currentRoot = $storageRoot . $path;
+
+    }
+
+    /**
+     * Удаление файла
+     */
+
+    public function actionDelete()
+    {
+        $storageRoot = Yii::getAlias('@webroot/storage/');
+
+        $request = Yii::$app->request;
+        $path = $request->get('path', '');
+
+        $currentRoot = $storageRoot . $path;
+
+        unlink($currentRoot);
     }
 }

@@ -1,0 +1,11 @@
+  [
+      {"id": 1,"name":"..","size":null,"type":"dir","date":"2018-11-17 06:14:01 +0000"},
+      {"id": 2,"name":"LICENSE.md","size":"1.58 KiB","type":"file","date":"2018-02-18 22:35:59 +0000"},
+      {"id": 3,"name":"README.md","size":"7.20 KiB","type":"file","date":"2018-02-18 22:35:59 +0000"},
+      {"id": 4,"name":"ajaxtest.json","size":"453 B","type":"file","date":"2018-11-12 08:01:31 +0000"},
+      {"id": 5,"name":"docker-compose.yml","size":"205 B","type":"file","date":"2018-02-18 22:35:59 +0000"},
+      {"id": 6,"name":"index-test.php","size":"498 B","type":"file","date":"2018-02-18 22:35:59 +0000"},
+      {"id": 7,"name":"testdir1","size":null,"type":"dir","date":"2018-11-17 06:13:00 +0000"},
+      {"id": 8,"name":"testdir2","size":null,"type":"dir","date":"2018-11-17 06:11:51 +0000"},
+      {"id": 9,"name":"testdir9","size":null,"type":"dir","date":"2018-11-17 06:14:01 +0000"}
+    ]
