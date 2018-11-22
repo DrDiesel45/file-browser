@@ -21,7 +21,7 @@ class AppAsset extends AssetBundle
     public $baseUrl = '@web';
     public $css = [
         'css/site.css',
-        'lib/extjs/build/classic/theme-neptune/resources/theme-neptune-all.css',
+        'lib/extjs/build/classic/theme-classic/resources/theme-classic-all.css',
     ];
     public $js = [
         'lib/extjs/build/ext-all-debug.js',
@@ -30,9 +30,7 @@ class AppAsset extends AssetBundle
         'js/model/FileModel.js',
         'js/store/FileStore.js',
         'js/controller/FileController.js',
-        'js/view/FileList.js',
         'js/view/FileView.js',
-        'js/data/files.json'
     ];
     public $depends = [
         'yii\web\YiiAsset',

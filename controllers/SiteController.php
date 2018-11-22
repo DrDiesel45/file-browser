@@ -41,7 +41,6 @@ class SiteController extends Controller
      *
      * @return string
      */
-
     public function actionList()
     {
         $storageRoot = Yii::getAlias('@webroot/storage/');
@@ -49,7 +48,6 @@ class SiteController extends Controller
         $path = $request->get('path', '');
 
 //        $storageRoot = '/';
-
         $currentRoot = $storageRoot . $path;
 //        $list = array_diff(scandir($currentRoot), array('.'));
 
@@ -79,7 +77,6 @@ class SiteController extends Controller
     /**
      * Создание файла
      */
-
     public function actionCreate()
     {
         $storageRoot = Yii::getAlias('@webroot/storage/');
@@ -94,8 +91,7 @@ class SiteController extends Controller
     /**
      * Добавление файлов
      */
-
-    public function actionUpload()
+    public function actionAdd()
     {
         $storageRoot = Yii::getAlias('@webroot/storage/');
 
@@ -116,8 +112,7 @@ class SiteController extends Controller
     /**
      * Сохранение файла
      */
-
-    public function actionLoad()
+    public function actionSave()
     {
         $storageRoot = Yii::getAlias('@webroot/storage/');
 
@@ -131,7 +126,6 @@ class SiteController extends Controller
     /**
      * Удаление файла
      */
-
     public function actionDelete()
     {
         $storageRoot = Yii::getAlias('@webroot/storage/');
@@ -141,6 +135,6 @@ class SiteController extends Controller
 
         $currentRoot = $storageRoot . $path;
 
-        unlink($currentRoot);
+        (!is_dir($currentRoot) ? unlink($currentRoot) : rmdir($currentRoot));
     }
 }

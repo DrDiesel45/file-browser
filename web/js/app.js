@@ -16,113 +16,6 @@ Ext.define('Files', {
     ]
 });
 
-// Ext.define('tbarButtons', {
-//     extend: 'Ext.toolbar.Toolbar',
-//     alias: 'widget.tbuttons',
-//
-//     initComponent: function () {
-//         this.items = [{
-//             xtype: 'button', text: 'Создать',
-//             tooltip: 'Создать файл',
-//             action: 'create'
-//         }, '-', {
-//             xtype: 'button', text: 'Добавить',
-//             tooltip: 'Добавить новый файл',
-//             action: 'add'
-//         }, '-', {
-//             xtype: 'button', text: 'Скачать',
-//             tooltip: 'Скачать выбранные файлы',
-//             action: 'load'
-//         }, '-', {
-//             xtype: 'button', text: 'Удалить',
-//             tooltip: 'Удалить выбранные файлы',
-//             action: 'delete'
-//         }]
-//     }
-// });
-//
-// Ext.define('ButtonsController', {
-//     extend: 'Ext.app.Controller',
-//
-//     init: function () {
-//         this.control({
-//             'tbuttons button [action=create]': {
-//                 click: this.createFile
-//             },
-//             'tbuttons button [action=add]': {
-//                 click: this.addFile
-//             },
-//             'tbuttons button [action=load]': {
-//                 click: this.loadFile
-//             },
-//             'tbuttons button [action=delete]': {
-//                 click: this.deleteFile
-//             }
-//         })
-//     },
-//
-//     // Создание
-//     createFile: function () {
-//         Ext.Ajax.request({
-//             url: '/site/create',
-//             params: values,
-//             success: function (response) {
-//                 var jsonData = JSON.parse(response.responseText);
-//                 filesStore.loadData(jsonData);
-//             },
-//             failure: function (response) {
-//                 alert("Ошибка: " + response.statusText);
-//             }
-//         });
-//     },
-//
-//     // Добавление
-//     addFile: function () {
-//         Ext.Ajax.request({
-//             url: '/site/upload',
-//             params: values,
-//             success: function (response) {
-//                 var jsonData = JSON.parse(response.responseText);
-//                 filesStore.loadData(jsonData);
-//             },
-//             failure: function (response) {
-//                 alert("Ошибка: " + response.statusText);
-//             }
-//         });
-//     },
-//
-//     // Скачивание
-//     loadFile: function () {
-//         Ext.Ajax.request({
-//             url: '/site/load',
-//             params: values,
-//             success: function (response) {
-//                 var jsonData = JSON.parse(response.responseText);
-//                 filesStore.loadData(jsonData);
-//             },
-//             failure: function (response) {
-//                 alert("Ошибка: " + response.statusText);
-//             }
-//         });
-//     },
-//
-//     // Удаление
-//     deleteFile: function () {
-//         Ext.Ajax.request({
-//             url: '/site/delete',
-//             params: {},
-//             success: function (response) {
-//                 var jsonData = JSON.parse(response.responseText);
-//                 filesStore.loadData(jsonData);
-//             },
-//             failure: function (response) {
-//                 alert("Ошибка: " + response.statusText);
-//             }
-//         });
-//     },
-//
-// });
-
 Ext.application({
     requires: ['Ext.container.Viewport'],
     name: 'FileManagerApp',
@@ -169,13 +62,13 @@ Ext.application({
                 //         buttonText: 'Выбрать',
                 //         listeners: {
                 //             change: function (fld, value) {
-                //                 var newValue = value.replace(/g, '');
+                //                 var newValue = value.replace(/\\path\\/g, '');
                 //                 fld.setRawValue(newValue);
                 //             }
                 //         },
                 //         msgTarget: 'side',
                 //         allowBlank: false,
-                //         buttonOnly: true,
+                //         // buttonOnly: true,
                 //         hideLabel: true,
                 //     }],
                 //     buttons: [{
@@ -196,6 +89,7 @@ Ext.application({
                 //         }
                 //     }]
                 // },
+
                 {
                     region: 'center',
                     xtype: 'tabpanel',
@@ -267,8 +161,15 @@ Ext.application({
                         },
 
                         tbar: [{
+                            xtype: 'button', text: 'Создать',
+                            tooltip: 'Создать файл',
+                            iconCls: 'new-icon',
+                            handler: function () {
+                            }
+                        }, '-', {
                             xtype: 'button', text: 'Добавить',
                             tooltip: 'Добавить новый файл',
+                            iconCls: 'add-icon',
                             handler: function () {
                                 // var form = this.up('form').getForm();
                                 // if(form.isValid()){
@@ -295,6 +196,7 @@ Ext.application({
                         }, '-', {
                             xtype: 'button', text: 'Скачать',
                             tooltip: 'Скачать выбранные файлы',
+                            iconCls: 'save-icon',
                             handler: function () {
                                 Ext.Msg.alert('Message', 'RARARA');
                                 // TODO: сделать функционал кнопки
@@ -302,6 +204,7 @@ Ext.application({
                         }, '-', {
                             xtype: 'button', text: 'Удалить',
                             tooltip: 'Удалить выбранные файлы',
+                            iconCls: 'delete-icon',
                             handler: function (grid, rowIndex) {
                                 // Ext.Msg.alert('message', 'kuliti!');
                                 var selectionModel = grid.getSelectionModel(), record;
@@ -395,8 +298,15 @@ Ext.application({
                         },
 
                         tbar: [{
+                            xtype: 'button', text: 'Создать',
+                            tooltip: 'Создать файл',
+                            iconCls: 'new-icon',
+                            handler: function () {
+                            }
+                        }, '-', {
                             xtype: 'button', text: 'Добавить',
                             tooltip: 'Добавить новый файл',
+                            iconCls: 'add-icon',
                             listeners: {
                                 click: function () {
                                     // TODO: сделать функционал кнопки
@@ -405,6 +315,7 @@ Ext.application({
                         }, '-', {
                             xtype: 'button', text: 'Скачать',
                             tooltip: 'Скачать выбранные файлы',
+                            iconCls: 'save-icon',
                             listeners: {
                                 click: function () {
                                     // TODO: сделать функционал кнопки
@@ -413,6 +324,7 @@ Ext.application({
                         }, '-', {
                             xtype: 'button', text: 'Удалить',
                             tooltip: 'Удалить выбранные файлы',
+                            iconCls: 'delete-icon',
                             listeners: {
                                 click: function () {
                                     // TODO: сделать функционал кнопки
