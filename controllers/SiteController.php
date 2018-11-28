@@ -38,18 +38,15 @@ class SiteController extends Controller
 
     /**
      * Вывод на экран содержимого файловой системы
-     *
-     * @return string
      */
     public function actionList()
     {
+        // в переменную $storageRoot задана корневая директория файловой системы
         $storageRoot = Yii::getAlias('@webroot/storage/');
         $request = Yii::$app->request;
         $path = $request->get('path', '');
 
-//        $storageRoot = '/';
         $currentRoot = $storageRoot . $path;
-//        $list = array_diff(scandir($currentRoot), array('.'));
 
         $list = scandir($currentRoot);
 
@@ -75,7 +72,7 @@ class SiteController extends Controller
     }
 
     /**
-     * Создание файла
+     * Создание папки
      */
     public function actionCreate()
     {
@@ -84,12 +81,19 @@ class SiteController extends Controller
         $request = Yii::$app->request;
         $path = $request->get('path', '');
 
-        $currentRoot = $storageRoot . $path;
+        $dirPath = $storageRoot . $path;
 
+        mkdir($dirPath);
+        $dirInfo = [
+            'name' => basename($dirPath),
+            'size' => null,
+            'type' => 'dir',
+            'date' => date('Y-m-d H:i:s O', filemtime($dirPath))];
+        return $this->asJson($dirInfo);
     }
 
     /**
-     * Добавление файлов
+     * Добавление файла
      */
     public function actionAdd()
     {
@@ -110,9 +114,9 @@ class SiteController extends Controller
     }
 
     /**
-     * Сохранение файла
+     * Скачивание файла
      */
-    public function actionSave()
+    public function actionLoad()
     {
         $storageRoot = Yii::getAlias('@webroot/storage/');
 
@@ -120,11 +124,32 @@ class SiteController extends Controller
         $path = $request->get('path', '');
 
         $currentRoot = $storageRoot . $path;
+        if (file_exists($currentRoot)) {
 
+            header("Content-Disposition: attachment; filename=\"" . basename($currentRoot) . "\"");
+            header("Content-Type: application/force-download");
+            header("Content-Description: File Transfer");
+            header("Content-Length: " . filesize($currentRoot));
+
+//            header('Content-Description: File Transfer');
+//            header('Content-Type: application/octet-stream');
+//            header('Content-Disposition: attachment; filename=' . basename($currentRoot));
+//            header('Expires: 0');
+//            header('Cache-Control: must-revalidate');
+//            header('Pragma: public');
+//            header('Content-Length: ' . filesize($currentRoot));
+
+//            header("Content-Length: ".filesize($currentRoot));
+//            header("Content-Disposition: attachment; filename=".$currentRoot);
+//            header("Content-Type: application/x-force-download; name=\"".$currentRoot."\"");
+
+            readfile($currentRoot);
+            exit;
+        }  else exit('No file');
     }
 
     /**
-     * Удаление файла
+     * Удаление файла или папки
      */
     public function actionDelete()
     {
@@ -134,7 +159,26 @@ class SiteController extends Controller
         $path = $request->get('path', '');
 
         $currentRoot = $storageRoot . $path;
-
-        (!is_dir($currentRoot) ? unlink($currentRoot) : rmdir($currentRoot));
+        if (is_dir($currentRoot)) {
+            $this->delTree($currentRoot);
+        } else unlink($currentRoot);
     }
+
+    /**
+     * Рекурсивное удаление папок с содержимым
+     *
+     * @param $currentRoot
+     * @return bool
+     */
+    public static function delTree($currentRoot)
+    {
+        $files = array_diff(scandir($currentRoot), array('.', '..'));
+        foreach ($files as $file) {
+            (is_dir("$currentRoot/$file")) ?
+                self::delTree("$currentRoot/$file") :
+                unlink("$currentRoot/$file");
+        }
+        return rmdir($currentRoot);
+    }
+
 }

@@ -7,12 +7,15 @@ Ext.define('Web.controller.FileController', {
     models: ['FileModel'],
     filePathFirst: [],
     filePathDelete: [],
+    filePathLoad: [],
 
     init: function () {
         var fileGridStore = this.lookupReference('fileGrid').getStore();
+        // отправка запроса на сервер
         Ext.Ajax.request({
             url: '/site/list',
             success: function (response) {
+                // при успешном запросе отображается содержимое хранилища в таблице
                 var jsonData = JSON.parse(response.responseText);
                 fileGridStore.loadData(jsonData);
             },
@@ -20,79 +23,76 @@ Ext.define('Web.controller.FileController', {
                 alert("Ошибка: " + response.statusText);
             }
         });
-        this.control({
-            'filewindow button[action=delete]': {
-                click: this.deleteFile
-            },
-        });
-
     },
-    // Создание
-    createFile: function (button) {
-        var form = window.down('form');
-        var values = form.getValues();
+
+    // Создать папку
+    createDir: function () {
+        var grid = this.lookupReference('fileGrid');
+
+        // получение значения, записанного в строку "название папки"
+        var dirName = this.lookupReference('newFolderName').getValue();
+        if (dirName === '') {
+            Ext.Msg.alert('Внимание', 'Введите имя папки!!');
+            return;
+        }
+        // присвоение переменной пути до папки
+        var dirPath = this.filePathFirst.join('') + '/' + dirName;
+
+        // очистка строки "название папки"
+        this.lookupReference('newFolderName').setValue();
+
+        // отправка запроса на сервер
         Ext.Ajax.request({
             url: '/site/create',
-            params: values,
+            method: 'GET',
+            params: {
+                path: dirPath,
+            },
             success: function (response) {
-                var data = Ext.decode(response.responseText);
-                if (data.success) {
-                    Ext.Msg.Alert('Создание', data.message);
-                    var store = Ext.widget('filelist').getStore();
-                    store.load();
-                }
-                else {
-                    Ext.Msg.alert('Создание', 'Не удалось добавить файл');
-                }
+                // обновление таблицы для отображения созданной папки
+                grid.getStore().add(JSON.parse(response.responseText));
+            },
+            failure: function (response) {
+                alert("Ошибка: " + response.statusText);
             }
         });
     },
-    // Добавление
-    addFile: function (button) {
-        var form = window.down('form');
-        var values = form.getValues();
+
+    // Добавить файл
+    addFile: function (button, rowIndex) {
+        var grid = this.lookupReference('fileGrid');
+
+        var fileName = this.lookupReference('fileData').getValue();
+
         Ext.Ajax.request({
             url: '/site/add',
             params: values,
             success: function (response) {
-                var data = Ext.decode(response.responseText);
-                if (data.success) {
-                    Ext.Msg.Alert('Добавление', data.message);
-                    var store = Ext.widget('filelist').getStore();
-                    store.load();
-                }
-                else {
-                    Ext.Msg.alert('Добавление', 'Не удалось добавить файл');
-                }
+            },
+            failure: function (response) {
+                alert("Ошибка: " + response.statusText);
             }
         });
     },
-    // Сохранение
-    saveFile: function (button, rowIndex) {
-        var grid = this.lookupReference('fileGrid');
-        var selectionModel = grid.getSelectionModel(), record;
-        // выделение нажатой строки
-        selectionModel.select(rowIndex);
-        // получение модели, которая отображена на выделенной строке в переменную
-        // record для дальнейшей манипуляции
-        record = selectionModel.getSelection()[0];
-        if (record.get('type') === 'file') {
-            return;
-        } else {
-            // проверка условий и внесение имен в массив
-            if (record.get('name') !== '..') {
-                this.filePathFirst.push(record.get('name'));
-                // удаление последнего элемента из массива
-            } else {
-                this.filePathFirst.pop();
-            }
-            // склеивание элементов массива через / в строку с путем по папкам
-            var filePath = this.filePathFirst.join('/');
-            console.log(filePath);
 
-            // передача строки с путём на сервер
+    // Скачать файл
+    loadFile: function (button, rowIndex) {
+        var me = this;
+        var grid = this.lookupReference('fileGrid');
+        var selectionModel = grid.getSelectionModel();
+        selectionModel.select(rowIndex);
+        var record = selectionModel.getSelection()[0];
+        {
+            if (record.get('name') !== '..') {
+                this.filePathLoad.push(record.get('name'));
+            } else this.filePathLoad.pop();
+
+            var filePath = me.filePathFirst.join('') + '/' + me.filePathLoad.join('/');
+            console.log(filePath);
+            this.filePathLoad.pop();
+
             Ext.Ajax.request({
-                url: '/site/save',
+                url: '/site/load',
                 method: 'GET',
                 params: {
                     path: filePath
@@ -101,26 +101,34 @@ Ext.define('Web.controller.FileController', {
                 },
                 failure: function (response) {
                     alert("Ошибка: " + response.statusText);
-                    this.filePathFirst.pop();
                 }
             });
         }
     },
 
-    // Удаление
+    // Удаление файла или папки
     deleteFile: function (button, rowIndex) {
+        var me = this;
         var grid = this.lookupReference('fileGrid');
+
+        // модель выбора строки из grid
         var selectionModel = grid.getSelectionModel();
+        // выделение нажатой строки
         selectionModel.select(rowIndex);
+        // получение модели, которая отображена на выделенной строке в переменную
+        // record для дальнейшей манипуляции
         var record = selectionModel.getSelection()[0];
         {
             if (record.get('name') !== '..') {
-                this.filePathDelete.push(record.get('name'));
-            } else this.filePathDelete.pop();
-            var filePath = this.filePathDelete.join('/');
-            console.log(filePath);
-            this.filePathDelete.pop();
+                me.filePathDelete.push(record.get('name'));
+            } else me.filePathDelete.pop();
 
+            // занесение в переменную filePath пути до удаляемого файла или папки
+            var filePath = me.filePathFirst.join('/') + '/' + me.filePathDelete.join('');
+            // очистка массива, в котором хранятся названия папок или файлов, которые удаляются
+            me.filePathDelete.pop();
+
+            // отправка запроса на сервер
             Ext.Ajax.request({
                 url: '/site/delete',
                 method: 'GET',
@@ -128,6 +136,7 @@ Ext.define('Web.controller.FileController', {
                     path: filePath
                 },
                 success: function () {
+                    // при успешном запросе, запись удаляется из хранилища и таблицы
                     grid.getStore().remove(record);
                 },
                 failure: function (response) {
@@ -135,19 +144,20 @@ Ext.define('Web.controller.FileController', {
                 }
             });
         }
-    },
+    }
+    ,
 
-    // По двойному клику на строку создается путь до файла, путем сложения корня и имени
-    // нажатой папки, в которой он лежит. Если двойной клик по точкам (.. или .), то
-    // происходит возврат на уровень выше, путем удаления имени папки, из которой мы вышли
+// По двойному клику на строку создается путь до файла, путем сложения корня и имени
+// нажатой папки, в которой он лежит. Если двойной клик по точкам (..), то
+// происходит возврат на уровень выше, путем удаления имени папки, из которой мы вышли, из массива
     changePath: function (grid, rowIndex) {
         // модель выбора строки из grid
-        var selectionModel = grid.getSelectionModel(), record;
+        var selectionModel = grid.getSelectionModel();
         // выделение нажатой строки
         selectionModel.select(rowIndex);
         // получение модели, которая отображена на выделенной строке в переменную
         // record для дальнейшей манипуляции
-        record = selectionModel.getSelection()[0];
+        var record = selectionModel.getSelection()[0];
         if (record.get('type') === 'file') {
             return;
         } else {
@@ -159,15 +169,15 @@ Ext.define('Web.controller.FileController', {
                 this.filePathFirst.pop();
             }
             // склеивание элементов массива через / в строку с путем по папкам
-            var filePath = this.filePathFirst.join('/');
-            console.log(filePath);
+            var pathFile = this.filePathFirst.join('/');
+            console.log(pathFile);
 
             // передача строки с путём на сервер
             Ext.Ajax.request({
                 url: '/site/list',
                 method: 'GET',
                 params: {
-                    path: filePath
+                    path: pathFile
                 },
                 success: function (response) {
                     var jsonData = JSON.parse(response.responseText);
@@ -175,12 +185,15 @@ Ext.define('Web.controller.FileController', {
                 },
                 failure: function (response) {
                     alert("Ошибка: " + response.statusText);
-                    this.filePathFirst.pop();
+                    // this.filePathFirst.pop();
                 }
             });
         }
-    },
-    // вызов меню по нажатию правой кнопки мыши на строку для удаления или скачивания файла
+    }
+    ,
+
+// нажатие правой кнопки мыши на строку для вызова контекстного меню,
+// в котором есть кнопки выбора для удаления или скачивания файла
     contextFile: function (record, item, index, e, eOpts) {
         var me = this;
         var xy = eOpts.getXY();
@@ -189,23 +202,25 @@ Ext.define('Web.controller.FileController', {
                 click: function (menu, item) {
                     if (item.cls === 'deleteItem') {
                         me.deleteFile();
-                    } else {
-                        me.saveFile();
+                    } else if (item.cls === 'loadFile') {
+                        me.loadFile();
                     }
                 }
             },
             items: [{
                 text: 'Скачать',
                 iconCls: 'save-icon',
+                cls: 'loadFile',
             }, {
                 text: 'Удалить',
                 iconCls: 'delete-icon',
                 cls: 'deleteItem'
             }]
         }).showAt(xy);
+        // отключение отображения контекстного меню браузера при однократном нажатии ПКМ,
+        // для отображения контекстного меню браузера необходимо нажать ПКМ ещё раз
         eOpts.stopEvent();
-    },
-    alertRow: function (button) {
-        Ext.Msg.alert('SEKA', 'KEKA');
-    },
-});
+    }
+    ,
+})
+;
