@@ -79,15 +79,21 @@ Ext.define('Web.controller.FileController', {
     loadFile: function (button, rowIndex) {
         var me = this;
         var grid = this.lookupReference('fileGrid');
+        var redirect = '/site/load';
+
+        // модель выбора строки из grid
         var selectionModel = grid.getSelectionModel();
+        // выделение нажатой строки
         selectionModel.select(rowIndex);
+        // получение модели, которая отображена на выделенной строке в переменную
+        // record для дальнейшей манипуляции
         var record = selectionModel.getSelection()[0];
         {
-            if (record.get('name') !== '..') {
-                this.filePathLoad.push(record.get('name'));
-            } else this.filePathLoad.pop();
+            if (record.get('type') !== 'file') {
+                Ext.Msg.alert('ВНИМАНИЕ!', 'Вы можете скачивать только файлы!');
+            } else this.filePathLoad.push(record.get('name'));
 
-            var filePath = me.filePathFirst.join('') + '/' + me.filePathLoad.join('/');
+            var filePath = me.filePathFirst.join('/') + '/' + me.filePathLoad.join('');
             console.log(filePath);
             this.filePathLoad.pop();
 
@@ -98,6 +104,9 @@ Ext.define('Web.controller.FileController', {
                     path: filePath
                 },
                 success: function () {
+                    window.location.href = redirect;
+                    // window.location.replace(redirect);
+                    // window.location.assign(redirect);
                 },
                 failure: function (response) {
                     alert("Ошибка: " + response.statusText);
@@ -121,7 +130,10 @@ Ext.define('Web.controller.FileController', {
         {
             if (record.get('name') !== '..') {
                 me.filePathDelete.push(record.get('name'));
-            } else me.filePathDelete.pop();
+            } else {
+                Ext.Msg.alert('ВНИМАНИЕ!', 'Вы не можете удалять это!');
+                return;
+            }
 
             // занесение в переменную filePath пути до удаляемого файла или папки
             var filePath = me.filePathFirst.join('/') + '/' + me.filePathDelete.join('');
@@ -144,8 +156,7 @@ Ext.define('Web.controller.FileController', {
                 }
             });
         }
-    }
-    ,
+    },
 
 // По двойному клику на строку создается путь до файла, путем сложения корня и имени
 // нажатой папки, в которой он лежит. Если двойной клик по точкам (..), то
@@ -189,8 +200,7 @@ Ext.define('Web.controller.FileController', {
                 }
             });
         }
-    }
-    ,
+    },
 
 // нажатие правой кнопки мыши на строку для вызова контекстного меню,
 // в котором есть кнопки выбора для удаления или скачивания файла
@@ -220,7 +230,5 @@ Ext.define('Web.controller.FileController', {
         // отключение отображения контекстного меню браузера при однократном нажатии ПКМ,
         // для отображения контекстного меню браузера необходимо нажать ПКМ ещё раз
         eOpts.stopEvent();
-    }
-    ,
-})
-;
+    },
+});

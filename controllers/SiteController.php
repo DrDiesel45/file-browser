@@ -41,7 +41,7 @@ class SiteController extends Controller
      */
     public function actionList()
     {
-        // в переменную $storageRoot задана корневая директория файловой системы
+        // в переменной $storageRoot задана корневая директория файловой системы
         $storageRoot = Yii::getAlias('@webroot/storage/');
         $request = Yii::$app->request;
         $path = $request->get('path', '');
@@ -124,6 +124,8 @@ class SiteController extends Controller
         $path = $request->get('path', '');
 
         $currentRoot = $storageRoot . $path;
+//        var_dump($currentRoot);
+//        die();
         if (file_exists($currentRoot)) {
 
             header("Content-Disposition: attachment; filename=\"" . basename($currentRoot) . "\"");
@@ -131,21 +133,9 @@ class SiteController extends Controller
             header("Content-Description: File Transfer");
             header("Content-Length: " . filesize($currentRoot));
 
-//            header('Content-Description: File Transfer');
-//            header('Content-Type: application/octet-stream');
-//            header('Content-Disposition: attachment; filename=' . basename($currentRoot));
-//            header('Expires: 0');
-//            header('Cache-Control: must-revalidate');
-//            header('Pragma: public');
-//            header('Content-Length: ' . filesize($currentRoot));
-
-//            header("Content-Length: ".filesize($currentRoot));
-//            header("Content-Disposition: attachment; filename=".$currentRoot);
-//            header("Content-Type: application/x-force-download; name=\"".$currentRoot."\"");
-
             readfile($currentRoot);
             exit;
-        }  else exit('No file');
+        } else exit('No file');
     }
 
     /**
