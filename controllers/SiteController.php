@@ -124,8 +124,6 @@ class SiteController extends Controller
         $path = $request->get('path', '');
 
         $currentRoot = $storageRoot . $path;
-//        var_dump($currentRoot);
-//        die();
         if (file_exists($currentRoot)) {
 
             header("Content-Disposition: attachment; filename=\"" . basename($currentRoot) . "\"");

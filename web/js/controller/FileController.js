@@ -79,7 +79,6 @@ Ext.define('Web.controller.FileController', {
     loadFile: function (button, rowIndex) {
         var me = this;
         var grid = this.lookupReference('fileGrid');
-        var redirect = '/site/load';
 
         // модель выбора строки из grid
         var selectionModel = grid.getSelectionModel();
@@ -91,11 +90,13 @@ Ext.define('Web.controller.FileController', {
         {
             if (record.get('type') !== 'file') {
                 Ext.Msg.alert('ВНИМАНИЕ!', 'Вы можете скачивать только файлы!');
+                return;
             } else this.filePathLoad.push(record.get('name'));
 
-            var filePath = me.filePathFirst.join('/') + '/' + me.filePathLoad.join('');
+            var filePath = me.filePathFirst.join('/') + '/' + this.filePathLoad.join('');
             console.log(filePath);
             this.filePathLoad.pop();
+            var redirect = '/site/load?path=' + filePath;
 
             Ext.Ajax.request({
                 url: '/site/load',
@@ -105,8 +106,6 @@ Ext.define('Web.controller.FileController', {
                 },
                 success: function () {
                     window.location.href = redirect;
-                    // window.location.replace(redirect);
-                    // window.location.assign(redirect);
                 },
                 failure: function (response) {
                     alert("Ошибка: " + response.statusText);
