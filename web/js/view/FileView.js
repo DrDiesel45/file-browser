@@ -48,7 +48,6 @@ Ext.define('Web.view.FileView', {
             dock: 'bottom',
             items: [{
                 text: 'Создать папку:',
-                tooltip: 'Создать новую папку',
                 iconCls: 'new-icon',
                 listeners: {
                     click: 'createDir'

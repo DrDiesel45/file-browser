@@ -102,9 +102,9 @@ class SiteController extends Controller
         $request = Yii::$app->request;
         $path = $request->get('path', '');
 
-        $currentRoot = $storageRoot . $path;
+        $addPath = $storageRoot . $path;
 
-        $uploadFile = $currentRoot . basename($_FILES['document']['name']);
+        $uploadFile = $addPath . basename($_FILES['document']['name']);
 
         if (move_uploaded_file($_FILES['document']['tmp_name'], $uploadFile)) {
             echo '{"success": true, "file": "' . $uploadFile . '" }';
@@ -123,15 +123,15 @@ class SiteController extends Controller
         $request = Yii::$app->request;
         $path = $request->get('path', '');
 
-        $currentRoot = $storageRoot . $path;
-        if (file_exists($currentRoot)) {
+        $loadPath = $storageRoot . $path;
+        if (file_exists($loadPath)) {
 
-            header("Content-Disposition: attachment; filename=\"" . basename($currentRoot) . "\"");
+            header("Content-Disposition: attachment; filename=\"" . basename($loadPath) . "\"");
             header("Content-Type: application/force-download");
             header("Content-Description: File Transfer");
-            header("Content-Length: " . filesize($currentRoot));
+            header("Content-Length: " . filesize($loadPath));
 
-            readfile($currentRoot);
+            readfile($loadPath);
             exit;
         } else exit('No file');
     }
@@ -146,27 +146,27 @@ class SiteController extends Controller
         $request = Yii::$app->request;
         $path = $request->get('path', '');
 
-        $currentRoot = $storageRoot . $path;
-        if (is_dir($currentRoot)) {
-            $this->delTree($currentRoot);
-        } else unlink($currentRoot);
+        $deletePath = $storageRoot . $path;
+        if (is_dir($deletePath)) {
+            $this->delTree($deletePath);
+        } else unlink($deletePath);
     }
 
     /**
      * Рекурсивное удаление папок с содержимым
      *
-     * @param $currentRoot
+     * @param $deletePath
      * @return bool
      */
-    public static function delTree($currentRoot)
+    public static function delTree($deletePath)
     {
-        $files = array_diff(scandir($currentRoot), array('.', '..'));
+        $files = array_diff(scandir($deletePath), array('.', '..'));
         foreach ($files as $file) {
-            (is_dir("$currentRoot/$file")) ?
-                self::delTree("$currentRoot/$file") :
-                unlink("$currentRoot/$file");
+            (is_dir("$deletePath/$file")) ?
+                self::delTree("$deletePath/$file") :
+                unlink("$deletePath/$file");
         }
-        return rmdir($currentRoot);
+        return rmdir($deletePath);
     }
 
 }

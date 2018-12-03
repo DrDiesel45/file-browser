@@ -34,6 +34,12 @@ Ext.define('Web.controller.FileController', {
         if (dirName === '') {
             Ext.Msg.alert('Внимание', 'Введите имя папки!!');
             return;
+        } else for (var i = 0; i < grid.getStore().count(); i++) {
+
+            if (grid.getStore().getAt(i).get('name') === dirName) {
+                Ext.Msg.alert('Внимание', 'Папка с таким именем уже существует!');
+                return;
+            }
         }
         // присвоение переменной пути до папки
         var dirPath = this.filePathFirst.join('') + '/' + dirName;
