@@ -9,7 +9,9 @@ Ext.define('Web.view.UploadView', {
             this.initConfig(config);
             this.callParent(arguments);
 
+            // получение имени атрибута из head
             var param = $('meta[name=csrf-param]').attr("content");
+            // получение значения csrf-token
             var token = $('meta[name=csrf-token]').attr("content");
 
             this.add({

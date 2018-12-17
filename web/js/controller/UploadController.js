@@ -8,8 +8,9 @@ Ext.define('Web.controller.UploadController', {
     filePathFirst: [],
 
     // Добавить файл
-    addFile: function (eOpts) {
+    addFile: function () {
         var grid = this.lookupReference('fileGrid');
+        // получение формы
         var upload = this.lookupReference('uploadForm').getForm();
 
         if (upload.isValid()) {
@@ -18,6 +19,8 @@ Ext.define('Web.controller.UploadController', {
                 method: 'POST',
                 waitMsg: 'Uploading your file...',
                 scope: this,
+                // проблемное место, возвращает failure, однако, файл загружается, поэтому
+                // перезагрузка страницы сделана и на failure
                 success: function () {
                     window.location.reload();
                     history.go(0);

@@ -10,6 +10,7 @@ Ext.define('Web.controller.FileController', {
     filePathLoad: [],
 
     init: function () {
+        // получение в переменную fileGridStore данных о хранилище
         var fileGridStore = this.lookupReference('fileGrid').getStore();
         // отправка запроса на сервер
         Ext.Ajax.request({
@@ -116,6 +117,7 @@ Ext.define('Web.controller.FileController', {
             var filePath = me.filePathFirst.join('/') + '/' + this.filePathLoad.join('');
             console.log(filePath);
             this.filePathLoad.pop();
+            // в переменную redirect передается путь файла, который нужно скачать
             var redirect = '/site/load?path=' + filePath;
 
             Ext.Ajax.request({
@@ -147,6 +149,8 @@ Ext.define('Web.controller.FileController', {
         // record для дальнейшей манипуляции
         var record = selectionModel.getSelection()[0];
         {
+            // если имя записи, которую необходимо удалить .., то выводится предупреждение,
+            // иначе, в массив filePathDelete заносится имя файла/папки, которая удаляется
             if (record.get('name') !== '..') {
                 me.filePathDelete.push(record.get('name'));
             } else {

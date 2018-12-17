@@ -45,16 +45,21 @@ class SiteController extends Controller
         // в переменной $storageRoot задана корневая директория файловой системы
         $storageRoot = Yii::getAlias('@webroot/storage/');
         $request = Yii::$app->request;
+        // в переменную $path передаётся путь, пройденный по папкам двойным нажатием ЛКМ
         $path = $request->get('path', '');
 
-        $currentRoot = $storageRoot . $path;
+        // в перменной $currentPath хранится текущий путь, который отображается на экране
+        $currentPath = $storageRoot . $path;
 
-        $list = scandir($currentRoot);
+        // в переменной $listData содержимое папки в текущем пути
+        $listData = scandir($currentPath);
 
+        // массив $listOfFiles для хранения информации о содержимом
         $listOfFiles = [];
-        foreach ($list as $filename) {
-            $filePath = $currentRoot . '/' . $filename;
+        foreach ($listData as $filename) {
+            $filePath = $currentPath . '/' . $filename;
             if (((filetype($filePath) == 'dir') || (filetype($filePath) == 'file')) && !(((strpos($filename, '.'))) === 0)) {
+                // заполнение массива информацией
                 $listOfFiles[] = [
                     'name' => $filename,
                     'size' => !is_dir($filePath) ? Yii::$app->formatter->asShortSize(filesize($filePath)) : null,
@@ -63,6 +68,7 @@ class SiteController extends Controller
                 ];
             }
         }
+        // добавление .. в массив, потому что, они были удалены (.. для перехода на уровень выше)
         array_unshift($listOfFiles, [
             'name' => '..',
             'size' => null,
@@ -82,9 +88,12 @@ class SiteController extends Controller
         $request = Yii::$app->request;
         $path = $request->get('path', '');
 
+        // в перменной $dirPath содержится путь, по которому надо создать папку
         $dirPath = $storageRoot . $path;
 
+        // создание папки
         mkdir($dirPath);
+        // массив с информацией о папке
         $dirInfo = [
             'name' => basename($dirPath),
             'size' => null,
@@ -101,13 +110,14 @@ class SiteController extends Controller
         $storageRoot = Yii::getAlias('@webroot/storage/');
         $request = Yii::$app->request;
 
+        // загрузка файлов
         $uploadFile = $storageRoot . basename($_FILES['fileUpload']['name']);
         if (move_uploaded_file($_FILES['fileUpload']['tmp_name'], $uploadFile)) {
         }
 
+        // массив с информацией о загружаемом файле
         $fileInfo = [
             'name' => basename($uploadFile),
-//            'size' => Yii::$app->formatter->asShortSize(filesize(basename($uploadFile))),
             'type' => 'file',
             'date' => date('Y-m-d H:i:s O', filemtime($uploadFile))
         ];
@@ -125,6 +135,8 @@ class SiteController extends Controller
         $path = $request->get('path', '');
 
         $loadPath = $storageRoot . $path;
+
+        // проверка является ли то, что надо скачать файлом и само скачивание файла
         if (file_exists($loadPath)) {
 
             header("Content-Disposition: attachment; filename=\"" . basename($loadPath) . "\"");
@@ -148,8 +160,11 @@ class SiteController extends Controller
         $path = $request->get('path', '');
 
         $deletePath = $storageRoot . $path;
+
+        // если удаляемый объект папка, то передача управления в функцию рекурсивного удаления
         if (is_dir($deletePath)) {
             $this->delTree($deletePath);
+        // если файл - то удаление файла
         } else unlink($deletePath);
     }
 
@@ -163,6 +178,8 @@ class SiteController extends Controller
     {
         $files = array_diff(scandir($deletePath), array('.', '..'));
         foreach ($files as $file) {
+            // если удаляемый объект является файлом, то он удаляется, если же папкой, то
+            // функция запускается заново
             (is_dir("$deletePath/$file")) ?
                 self::delTree("$deletePath/$file") :
                 unlink("$deletePath/$file");
