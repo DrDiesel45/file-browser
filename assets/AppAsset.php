@@ -30,7 +30,9 @@ class AppAsset extends AssetBundle
         'js/model/FileModel.js',
         'js/store/FileStore.js',
         'js/controller/FileController.js',
+        'js/controller/UploadController.js',
         'js/view/FileView.js',
+        'js/view/UploadView.js',
     ];
     public $depends = [
         'yii\web\YiiAsset',

@@ -10,6 +10,7 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
+use yii\helpers\Html;
 
 class SiteController extends Controller
 {
@@ -24,6 +25,8 @@ class SiteController extends Controller
             ],
         ];
     }
+
+    public $enableCsrfValidation = false;
 
     /**
      * Displays homepage.
@@ -98,19 +101,60 @@ class SiteController extends Controller
     public function actionAdd()
     {
         $storageRoot = Yii::getAlias('@webroot/storage/');
-
         $request = Yii::$app->request;
-        $path = $request->get('path', '');
 
-        $addPath = $storageRoot . $path;
+/*        <input type="hidden" name="_csrf" value="<?=Yii::$app->request->getCsrfToken()?>"> */
 
-        $uploadFile = $addPath . basename($_FILES['document']['name']);
+//        $csrfToken = $request->getCsrfToken();
+//        var_dump($csrfToken);
 
-        if (move_uploaded_file($_FILES['document']['tmp_name'], $uploadFile)) {
-            echo '{"success": true, "file": "' . $uploadFile . '" }';
-        } else {
-            echo '{"success": false}';
+//        $request = Yii::$app->request;
+//        $path = $request->get('path', '');
+//
+//        $addPath = $storageRoot . $path;
+//
+//        $uploadFile = $addPath . basename($_FILES['userfile']['name']);
+//        if (move_uploaded_file($_FILES['userfile']['tmp_name'], $uploadFile)) {
+//            echo '{"success": true, "file": "' . $uploadFile . '" }';
+//        } else {
+//            echo '{"success": false}';
+//        }
+
+//        $token = $request->post('token', '');
+//        $token = $request->post('csrfParam', '');
+//        $param = $request->post('param1', '');
+//        var_dump($token);
+//        var_dump($param);
+//        die();
+//
+//        session_start();
+// Create a new CSRF token.
+//        if (!isset($_SESSION['csrf_token'])) {
+//            $_SESSION['csrf_token'] = base64_encode(openssl_random_pseudo_bytes(32));
+//        }
+// Check a POST is valid.
+//        if (isset($csrfToken) && $csrfToken === $token) {
+        // POST data is valid.
+//        }
+
+//        $params = $request->post('data', '');
+//        $params = $_POST['params'];
+        var_dump($_POST);
+        die();
+
+
+
+        $uploadFile = $storageRoot . basename($_FILES['fileUpload']['name']);
+        if (move_uploaded_file($_FILES['fileUpload']['tmp_name'], $uploadFile)) {
         }
+
+//        $fileInfo = [
+//            'name' => basename($uploadFile),
+//            'size' => Yii::$app->formatter->asShortSize(filesize(basename($uploadFile))),
+//            'type' => 'file',
+//            'date' => date('Y-m-d H:i:s O', filemtime($uploadFile))
+//        ];
+//        return $this->asJson($fileInfo);
     }
 
     /**

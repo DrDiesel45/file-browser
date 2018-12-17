@@ -2,7 +2,7 @@ Ext.define('Web.controller.FileController', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.filectrl',
 
-    views: ['FileView'],
+    views: ['FileView', 'UploadView'],
     stores: ['FileStore'],
     models: ['FileModel'],
     filePathFirst: [],
@@ -38,11 +38,12 @@ Ext.define('Web.controller.FileController', {
 
             if (grid.getStore().getAt(i).get('name') === dirName) {
                 Ext.Msg.alert('Внимание', 'Папка с таким именем уже существует!');
+                this.lookupReference('newFolderName').setValue();
                 return;
             }
         }
         // присвоение переменной пути до папки
-        var dirPath = this.filePathFirst.join('') + '/' + dirName;
+        var dirPath = this.filePathFirst.join('/') + '/' + dirName;
 
         // очистка строки "название папки"
         this.lookupReference('newFolderName').setValue();
@@ -65,21 +66,34 @@ Ext.define('Web.controller.FileController', {
     },
 
     // Добавить файл
-    addFile: function (button, rowIndex) {
-        var grid = this.lookupReference('fileGrid');
-
-        var fileName = this.lookupReference('fileData').getValue();
-
-        Ext.Ajax.request({
-            url: '/site/add',
-            params: values,
-            success: function (response) {
-            },
-            failure: function (response) {
-                alert("Ошибка: " + response.statusText);
-            }
-        });
-    },
+    // addFile: function (me, value) {
+    //     var grid = this.lookupReference('fileGrid');
+    //     var upload = this.lookupReference('uploadForm').getForm();
+    //
+    //     var fileName = value.replace(/C:\\fakepath\\/g, '');
+    //     me.setRawValue(fileName);
+    //
+    //     var filePath = this.filePathFirst.join('') + '/' + fileName;
+    //     console.log(filePath);
+    //     var redirect = '/site/add?path=' + filePath;
+    //
+    //     Ext.Ajax.request({
+    //         url: '/site/add',
+    //         method: 'GET',
+    //         params: [{
+    //             path: filePath
+    //         }, {
+    //
+    //         }],
+    //         success: function (response) {
+    //             window.location.href = redirect;
+    //             grid.getStore().add(JSON.parse(response.responseText));
+    //         },
+    //         failure: function (response) {
+    //             alert("Ошибка: " + response.statusText);
+    //         }
+    //     });
+    // },
 
     // Скачать файл
     loadFile: function (button, rowIndex) {

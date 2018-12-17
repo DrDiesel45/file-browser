@@ -58,19 +58,12 @@ Ext.define('Web.view.FileView', {
                 xtype: 'textfield',
                 width: 120
             }, '-', {
-                xtype: 'filefield',
-                reference: 'fileData',
-                width: 0,
-                buttonText: 'Добавить файл',
-                buttonOnly: true,
-                listeners: {
-
-                }
-                // tooltip: 'Добавить файл',
-                // iconCls: 'add-icon',
-                // listeners: {
-                //     click: 'addFile'
-                // }
+                tooltip: 'Добавить файл',
+                text: 'Добавить файл',
+                iconCls: 'add-icon',
+                handler: function () {
+                    Ext.create('Web.view.UploadView').show();
+                },
             }]
         }],
     }],
